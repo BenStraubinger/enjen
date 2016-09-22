@@ -56,6 +56,7 @@ add_executable( enjen
 
         src/Enjen.cpp src/Enjen.h
 
+        src/core/Cfg.cpp src/core/Cfg.h
         src/core/Runtime.cpp src/core/Runtime.h
         src/core/Renderer.cpp src/core/Renderer.h
 

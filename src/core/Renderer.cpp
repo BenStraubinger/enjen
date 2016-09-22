@@ -2,6 +2,7 @@
 
 
 #include "Enjen.h"
+#include "core/Cfg.h"
 
 
 #include <iostream>
@@ -11,49 +12,68 @@ Renderer::Renderer(Enjen *game)
 	: _game(game),
 	  _window(nullptr),
 	  _glContext(nullptr),
+	  _window_title("enjen"),
+	  _window_border(false),
 	  _window_size(1280, 720),
 	  _clear_colour(0.0f, 0.0f, 0.0f)
 {
-	std::cout << "Renderer::Renderer()" << std::endl;
 }
 
 
 Renderer::~Renderer()
 {
-	std::cout << "Renderer::~Renderer()" << std::endl;
 }
 
 
 bool Renderer::CreateWindow(unsigned int width, unsigned int height)
 {
-	std::cout << "Renderer::CreateWindow()" << std::endl;
-
 	_window_size.x = width;
 	_window_size.y = height;
 
-	std::cout << "Renderer creating window: "<< std::endl;
-	_window = SDL_CreateWindow("enjen",
+	Cfg* cfg_obj = _game->GetCfg();
+	Json::Value cfg = cfg_obj->GetRoot();
+	if ( cfg.isObject() ) {
+		if ( cfg["window"].isMember("title") && cfg["window"]["title"].isString() ) {
+			_window_title = cfg["window"]["title"].asString();
+		}
+		if ( cfg["window"].isMember("width") && cfg["window"]["width"].isUInt() ) {
+			_window_size.x = cfg["window"]["width"].asUInt();
+		}
+		if ( cfg["window"].isMember("height") && cfg["window"]["height"].isUInt() ) {
+			_window_size.y = cfg["window"]["height"].asUInt();
+		}
+		if ( cfg["window"].isMember("border") && cfg["window"]["border"].isBool() ) {
+			_window_border = cfg["window"]["border"].asBool();
+		}
+	}
+
+	Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
+
+	if (! _window_border) {
+		sdl_flags |= SDL_WINDOW_BORDERLESS;
+	}
+
+	_window = SDL_CreateWindow(_window_title.c_str(),
 							   SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 							   _window_size.x, _window_size.y,
-							   SDL_WINDOW_OPENGL);
+							   sdl_flags);
 
 	if (!_window)
 	{
-		std::cout << "Renderer failed to create window: " << SDL_GetError() << std::endl;
+		std::cerr << "Renderer failed to create SDL_Window: " << SDL_GetError() << std::endl;
 		return false;
 	}
-	std::cout << "Renderer created the window. "<< std::endl;
 
 	_glContext = SDL_GL_CreateContext(_window);
 	if (!_glContext)
 	{
-		std::cout << "Renderer failed to create GL context: " << SDL_GetError() << std::endl;
+		std::cerr << "Renderer failed to create OpenGL context: " << SDL_GetError() << std::endl;
 		return false;
 	}
 
 	if (!InitGraphics())
 	{
-		std::cout << "Renderer failed to initialize graphics settings. " << std::endl;
+		std::cerr << "Renderer failed to set up the window. " << std::endl;
 		return false;
 	}
 
@@ -67,8 +87,6 @@ bool Renderer::CreateWindow(unsigned int width, unsigned int height)
 
 void Renderer::CloseWindow()
 {
-	std::cout << "Renderer::CloseWindow()" << std::endl;
-
 	SDL_GL_DeleteContext(_glContext);
 	SDL_DestroyWindow(_window);
 }
@@ -106,8 +124,6 @@ void Renderer::ShowFrame()
 
 void Renderer::LogGraphicsInfo()
 {
-	std::cout << "Runtime::LogGraphicsInfo()" << std::endl;
-
 	int value = 0;
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &value);
 	std::cout << "SDL_GL_CONTEXT_MAJOR_VERSION : " << value << std::endl;
@@ -134,6 +150,8 @@ void Renderer::LogGraphicsInfo()
 	} else {
 		std::cout << "VSync: no" << std::endl;
 	}
+
+	std::cout << "Window dimensions: " << _window_size.x << "x" << _window_size.y << std::endl;
 }
 
 
@@ -152,7 +170,7 @@ bool Renderer::InitGraphics()
 	failure |= SDL_GL_SetSwapInterval(1);
 
 	if(failure) {
-		std::cout << "Renderer failed to set GL attributes." << std::endl;
+		std::cerr << "Renderer failed to set OpenGL attributes." << std::endl;
 		return false;
 	}
 
@@ -160,7 +178,7 @@ bool Renderer::InitGraphics()
 	failure |= glewInit();
 
 	if(failure) {
-		std::cout << "Renderer failed to initialize GLEW." << std::endl;
+		std::cerr << "Renderer failed to initialize GLEW." << std::endl;
 		return false;
 	}
 

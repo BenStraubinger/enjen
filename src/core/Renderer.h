@@ -11,6 +11,9 @@
 #include "glm/vec3.hpp"
 
 
+#include <string>
+
+
 // forward declarations:
 class Enjen;
 
@@ -43,7 +46,10 @@ private:
 	SDL_Window *_window;
 	SDL_GLContext _glContext;
 
+	std::string _window_title;
+	bool _window_border;
 	glm::uvec2 _window_size;
+
 	glm::vec3 _clear_colour;
 
 	bool InitGraphics();

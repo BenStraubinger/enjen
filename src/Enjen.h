@@ -9,6 +9,7 @@
 
 
 // forward declarations:
+class Cfg;
 class Runtime;
 
 
@@ -20,6 +21,8 @@ public:
 	Enjen();
 	~Enjen();
 
+	Cfg* GetCfg();
+
 	bool Startup();
 	void Shutdown();
 
@@ -29,6 +32,7 @@ public:
 
 private:
 
+	Cfg *_cfg;
 	Runtime *_rt;
 
 	bool _run_game;

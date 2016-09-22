@@ -11,34 +11,28 @@ Runtime::Runtime(Enjen* game)
 	: _game(game),
 	  _renderer(nullptr)
 {
-	std::cout << "Runtime::Runtime()" << std::endl;
 }
 
 
 Runtime::~Runtime()
 {
-	std::cout << "Runtime::~Runtime()" << std::endl;
 }
 
 
 bool Runtime::Startup()
 {
-	std::cout << "Runtime::CreateWindow()" << std::endl;
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
-		std::cout << "Runtime failed to init SDL2." << std::endl;
+		std::cerr << "Runtime failed to initialize SDL2." << std::endl;
 		return false;
 	}
 
 	_renderer = new Renderer(_game);
 	if(!_renderer->CreateWindow())
 	{
-		std::cout << "Runtime failed to start the renderer." << std::endl;
+		std::cerr << "Runtime failed to create the window." << std::endl;
 		return false;
 	}
-
-	std::cout << "Runtime started the renderer." << std::endl;
 
 	return true;
 }
@@ -46,8 +40,6 @@ bool Runtime::Startup()
 
 void Runtime::Shutdown()
 {
-	std::cout << "Runtime::CloseWindow()" << std::endl;
-
 	_renderer->CloseWindow();
 	delete _renderer;
 
@@ -58,18 +50,17 @@ void Runtime::Shutdown()
 bool Runtime::CreateWindow(unsigned int width, unsigned int height)
 {
 	if(_renderer != nullptr) {
-		std::cout << "Runtime failed to create window, a window already exists." << std::endl;
+		std::cerr << "Runtime failed to create window, a window already exists." << std::endl;
 		return false;
 	}
 
 	_renderer = new Renderer(_game);
 	if(!_renderer->CreateWindow(width, height))
 	{
-		std::cout << "Runtime failed to start the renderer." << std::endl;
+		std::cerr << "Runtime failed to create the window." << std::endl;
 		return false;
 	}
 
-	std::cout << "Runtime started the renderer." << std::endl;
 	return true;
 }
 
@@ -77,7 +68,7 @@ bool Runtime::CreateWindow(unsigned int width, unsigned int height)
 void Runtime::CloseWindow()
 {
 	if(_renderer == nullptr) {
-		std::cout << "Runtime failed to close window, no window currently exists." << std::endl;
+		std::cerr << "Runtime failed to close window, no window currently exists." << std::endl;
 		return;
 	}
 

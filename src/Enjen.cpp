@@ -1,5 +1,7 @@
 #include "Enjen.h"
 
+
+#include "core/Cfg.h"
 #include "core/Runtime.h"
 
 
@@ -10,23 +12,25 @@ Enjen::Enjen()
 	: _rt(nullptr),
 	  _run_game(false)
 {
-	std::cout << "Enjen::Enjen()" << std::endl;
 }
 
 
 Enjen::~Enjen()
 {
-	std::cout << "Enjen::~Enjen()" << std::endl;
 }
 
 
 bool Enjen::Startup()
 {
-	std::cout << "Enjen::CreateWindow()" << std::endl;
+	_cfg = new Cfg();
+	if( ! _cfg->LoadFile("config.json") ) {
+		std::cerr << "Enjen failed to load config file." << std::endl;
+		return false;
+	}
 
 	_rt = new Runtime(this);
 	if(! _rt->Startup()) {
-		std::cout << "Enjen failed to start the runtime." << std::endl;
+		std::cerr << "Enjen failed to start the runtime." << std::endl;
 		return false;
 	}
 
@@ -36,8 +40,6 @@ bool Enjen::Startup()
 
 void Enjen::Shutdown()
 {
-	std::cout << "Enjen::CloseWindow()" << std::endl;
-
 	_rt->Shutdown();
 	delete _rt;
 }
@@ -45,14 +47,11 @@ void Enjen::Shutdown()
 
 void Enjen::Run()
 {
-	std::cout << "Enjen::Run()" << std::endl;
-
 	for(_run_game = true; _run_game; ) {
 
 		_rt->Update();
 
 	}
-
 }
 
 
@@ -60,6 +59,14 @@ void Enjen::Stop()
 {
 	_run_game = false;
 }
+
+
+Cfg *Enjen::GetCfg()
+{
+	return _cfg;
+}
+
+
 
 
 
