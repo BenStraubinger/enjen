@@ -3,14 +3,19 @@
 
 
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "SDL.h"
+
+#include <memory>
 
 
 // forward declarations:
 class Cfg;
 class Runtime;
+class Renderer;
+class Input;
+class Controller;
 
 
 class Enjen
@@ -20,23 +25,40 @@ public:
 
 	Enjen();
 	~Enjen();
-
-	Cfg* GetCfg();
+	
+	static Enjen* Get();
 
 	bool Startup();
 	void Shutdown();
+	
+	bool CreateWindow();
+	void CloseWindow();
 
 	void Run();
 	void Stop();
+	
+	void Sleep(unsigned int milliseconds);
+	
+	
+	bool CheckControllerButton( unsigned int controller_id, std::string button_name );
+	void UpdateControllerButton( unsigned int controller_id, std::string button_name, bool pressed );
 
 
 private:
-
-	Cfg *_cfg;
-	Runtime *_rt;
-
+	
+	// basic singleton
+	static Enjen* _enjen;
+	static bool Set(Enjen* instance);
+	
+	// game state
 	bool _run_game;
-
+	
+	
+	std::unique_ptr<Cfg> _cfg;
+	std::unique_ptr<Runtime> _rt;
+	std::unique_ptr<Renderer> _renderer;
+	std::unique_ptr<Input> _input;
+	
 };
 
 

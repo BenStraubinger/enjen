@@ -2,14 +2,13 @@
 
 #include "Enjen.h"
 #include "core/Renderer.h"
+//#include "core/Window.h"
 
 
 #include <iostream>
 
 
-Runtime::Runtime(Enjen* game)
-	: _game(game),
-	  _renderer(nullptr)
+Runtime::Runtime()
 {
 }
 
@@ -27,112 +26,135 @@ bool Runtime::Startup()
 		return false;
 	}
 
-	_renderer = new Renderer(_game);
-	if(!_renderer->CreateWindow())
-	{
-		std::cerr << "Runtime failed to create the window." << std::endl;
-		return false;
-	}
-
 	return true;
 }
 
 
 void Runtime::Shutdown()
 {
-	_renderer->CloseWindow();
-	delete _renderer;
-
 	SDL_Quit();
 }
 
 
-bool Runtime::CreateWindow(unsigned int width, unsigned int height)
+std::unique_ptr<Renderer> Runtime::CreateWindow(std::string title, unsigned int width, unsigned int height, bool show_border)
 {
-	if(_renderer != nullptr) {
-		std::cerr << "Runtime failed to create window, a window already exists." << std::endl;
-		return false;
-	}
-
-	_renderer = new Renderer(_game);
-	if(!_renderer->CreateWindow(width, height))
+	std::unique_ptr<Renderer> renderer = std::make_unique<Renderer>();
+	if(!renderer->CreateWindow(title, width, height, show_border))
 	{
 		std::cerr << "Runtime failed to create the window." << std::endl;
-		return false;
+		return nullptr;
 	}
 
-	return true;
+	return std::move(renderer);
 }
 
-
-void Runtime::CloseWindow()
-{
-	if(_renderer == nullptr) {
-		std::cerr << "Runtime failed to close window, no window currently exists." << std::endl;
-		return;
-	}
-
-	_renderer->CloseWindow();
-	delete _renderer;
-	_renderer = nullptr;
-}
 
 
 void Runtime::Update()
 {
-	//std::cout << "Runtime::Run()" << std::endl;
-
+	auto game = Enjen::Get();
+	if (! game) {
+		std::cerr << "Runtime failed to get a pointer to the game instance." << std::endl;
+		return;
+	}
+	
 	SDL_Event event;
+	bool key_pressed;
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT) {
-			_game->Stop();
+			std::cout << "CloseWindow event - Last Window " << std::endl;
+			game->Stop();
 			return;
+		}
+		
+		
+		if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+			std::cout << "CloseWindow event." << std::endl;
+		}
+		
+		
+		if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+			int width = event.window.data1;
+			int height = event.window.data2;
+			std::cout << "Window resize event: " << width << "x" << height << std::endl;
 		}
 
 
-		if (event.type == SDL_KEYDOWN)
+		if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 		{
+			if(event.type == SDL_KEYDOWN) {
+				key_pressed = true;
+			} else {
+				key_pressed = false;
+			}
+			
 			switch (event.key.keysym.sym)
 			{
-			// quit game
+			
+			// direction keys
+			case SDLK_UP:
+			case SDLK_w:
+				game->UpdateControllerButton(0, "UP", key_pressed);
+				break;
+			case SDLK_DOWN:
+			case SDLK_s:
+				game->UpdateControllerButton(0, "DOWN", key_pressed);
+				break;
+			case SDLK_LEFT:
+			case SDLK_a:
+				game->UpdateControllerButton(0, "LEFT", key_pressed);
+				break;
+			case SDLK_RIGHT:
+			case SDLK_d:
+				game->UpdateControllerButton(0, "RIGHT", key_pressed);
+				break;
+				
+			// start
+			case SDLK_RETURN:
+				game->UpdateControllerButton(0, "START", key_pressed);
+				break;
+			// back
 			case SDLK_ESCAPE:
-				_game->Stop();
-				return;
-
-			// set background colour: black
-			case SDLK_1:
-				_renderer->SetClearColour(0.0f, 0.0f, 0.0f);
+				game->UpdateControllerButton(0, "BACK", key_pressed);
 				break;
-			// set background colour: red
-			case SDLK_2:
-				_renderer->SetClearColour(1.0f, 0.0f, 0.0f);
+				
+			//
+			case SDLK_SPACE:
+			case SDLK_SLASH:
+				game->UpdateControllerButton(0, "B1", key_pressed);
 				break;
-			// set background colour: green
-			case SDLK_3:
-				_renderer->SetClearColour(0.0f, 1.0f, 0.0f);
-				break;
-			// set background colour: blue
-			case SDLK_4:
-				_renderer->SetClearColour(0.0f, 0.0f, 1.0f);
-				break;
-			// set background colour: white
-			case SDLK_5:
-				_renderer->SetClearColour(1.0f, 1.0f, 1.0f);
-				break;
-
-			// close and reopen the window at 1280x720
+			//
+			case SDLK_LCTRL:
 			case SDLK_COMMA:
-				CloseWindow();
-				SDL_Delay(250);
-				CreateWindow(1280, 720);
+				game->UpdateControllerButton(0, "B2", key_pressed);
+				break;
+			//
+			case SDLK_LALT:
+			case SDLK_PERIOD:
+				game->UpdateControllerButton(0, "B3", key_pressed);
+				break;
+			//
+			case SDLK_LSHIFT:
+			case SDLK_m:
+				game->UpdateControllerButton(0, "B4", key_pressed);
 				break;
 
-			// close and reopen the window at 1440x900
-			case SDLK_PERIOD:
-				CloseWindow();
-				SDL_Delay(250);
-				CreateWindow(1440, 900);
+			// dev-mode keys
+			case SDLK_1:
+				game->UpdateControllerButton(0, "D1", key_pressed);
+				break;
+			case SDLK_2:
+				game->UpdateControllerButton(0, "D2", key_pressed);
+				break;
+			case SDLK_3:
+				game->UpdateControllerButton(0, "D3", key_pressed);
+				break;
+			case SDLK_4:
+				game->UpdateControllerButton(0, "D4", key_pressed);
+				break;
+			case SDLK_5:
+				game->UpdateControllerButton(0, "D5", key_pressed);
 				break;
 
 			// ignore unexpected keys
@@ -140,15 +162,10 @@ void Runtime::Update()
 				break;
 			}
 		}
-
-
-
-
-		_renderer->ClearFrame();
-		_renderer->ShowFrame();
-
 	}
 }
+
+
 
 
 

@@ -3,7 +3,7 @@
 
 
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "SDL.h"
 
@@ -23,12 +23,10 @@ class Renderer
 
 public:
 
-	Renderer() = delete;
-	Renderer(Enjen* game);
-
+	Renderer();
 	~Renderer();
 
-	bool CreateWindow(unsigned int width = 1280, unsigned int height = 720);
+	bool CreateWindow(std::string title, unsigned int width, unsigned int height, bool show_border = true);
 	void CloseWindow();
 
 	void ClearFrame();
@@ -41,21 +39,14 @@ public:
 
 private:
 
-	Enjen *_game;
-
-	SDL_Window *_window;
+	SDL_Window *_sdlWindow;
 	SDL_GLContext _glContext;
-
-	std::string _window_title;
-	bool _window_border;
-	glm::uvec2 _window_size;
 
 	glm::vec3 _clear_colour;
 
 	bool InitGraphics();
 
 };
-
 
 
 #endif //ENJEN_RENDERER_H

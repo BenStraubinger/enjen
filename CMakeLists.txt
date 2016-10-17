@@ -1,16 +1,15 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.4)
 project(enjen)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+include(${PROJECT_SOURCE_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
-
-
+include_directories("${PROJECT_SOURCE_DIR}/ext/jsoncpp")
 
 
 ################################################################################
@@ -19,29 +18,29 @@ include_directories("${PROJECT_SOURCE_DIR}/src")
 #
 ################################################################################
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
+#
+# OpenGL: (https://www.opengl.org/wiki/Getting_Started
+#
+find_package(OpenGL)
+if(NOT OPENGL_FOUND)
+    message(ERROR "OpenGL not found!")
+endif(NOT OPENGL_FOUND)
+if(NOT OPENGL_GLU_FOUND)
+    message(ERROR "OpenGL GLU not found!")
+endif(NOT OPENGL_GLU_FOUND)
 
-find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIR})
 
-
-
-
-################################################################################
 #
-# external source libraries:
+# GLEW: (http://glew.sourceforge.net/)
 #
-################################################################################
+find_package(GLEW)
+if(NOT GLEW_FOUND)
+    message(ERROR "GLEW not found!")
+endif(NOT GLEW_FOUND)
 
-include_directories("${PROJECT_SOURCE_DIR}/ext/glm")
-
-include_directories("${PROJECT_SOURCE_DIR}/ext/jsoncpp")
-
-
+include_directories(${GLEW_INCLUDE_DIRS})
 
 
 ################################################################################
@@ -59,6 +58,8 @@ add_executable( enjen
         src/core/Cfg.cpp src/core/Cfg.h
         src/core/Runtime.cpp src/core/Runtime.h
         src/core/Renderer.cpp src/core/Renderer.h
+        src/core/Input.cpp src/core/Input.h
+        src/core/Controller.cpp src/core/Controller.h
 
 
         #
@@ -70,9 +71,9 @@ add_executable( enjen
 )
 
 
-target_link_libraries( enjen
-        ${SDL2_LIBRARY}
-        ${OPENGL_gl_LIBRARY}
-        ${OPENGL_glu_LIBRARY}
-        ${GLEW_LIBRARY}
+target_link_libraries( enjen 
+    ${CONAN_LIBS}
+    ${OPENGL_gl_LIBRARY}
+    ${OPENGL_glu_LIBRARY}
+    ${GLEW_LIBRARIES}
 )

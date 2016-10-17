@@ -3,9 +3,12 @@
 
 
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include "GL/glew.h"
 
 #include "SDL.h"
+
+#include <string>
+#include <memory>
 
 
 // forward declarations:
@@ -18,23 +21,18 @@ class Runtime
 
 public:
 
-	Runtime() = delete;
-	Runtime(Enjen* _game);
+	Runtime();
 	~Runtime();
 
 	bool Startup();
 	void Shutdown();
 
-	bool CreateWindow(unsigned int width = 1280, unsigned int height = 720);
-	void CloseWindow();
+	std::unique_ptr<Renderer> CreateWindow(std::string title, unsigned int width = 1280, unsigned int height = 720, bool show_border = true);
 
 	void Update();
 
 
 private:
-
-	Enjen *_game;
-	Renderer *_renderer;
 
 };
 
