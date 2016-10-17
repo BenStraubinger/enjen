@@ -94,17 +94,9 @@ void Enjen::CloseWindow()
 
 
 void Enjen::Run()
-{
-	auto start = std::chrono::high_resolution_clock::now();
-	auto end = start + std::chrono::milliseconds(5000);
-	
+{	
 	_run_game = true;
 	while ( _run_game ) {
-
-		if ( end <= std::chrono::high_resolution_clock::now() ) {
-			std::cout << "Enjen ran for 5 seconds." << std::endl;
-			break;
-		}
 		
 		_rt->Update();
 		if(_input->CheckButton(0, "BACK")) {

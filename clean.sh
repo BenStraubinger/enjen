@@ -11,6 +11,12 @@ echo -e "\n  Cleaning up Conan build files..."
 rm -rf conanbuildinfo.* conaninfo.txt
 echo "  Done."
 
+if [[ -f enjen.sln ]]; then
+	echo -e "\n  Cleaning up Visual Studio project files..."
+	rm -rf enjen.sln *.vcxproj* *.VC.db lib/ x64/ enjen.dir
+	echo "  Done."
+fi
+
 echo -e "\n  Cleaning up binary files..."
 rm -rf bin/
 echo "  Done."
