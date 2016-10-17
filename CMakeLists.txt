@@ -32,17 +32,6 @@ endif(NOT OPENGL_GLU_FOUND)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 
-#
-# GLEW: (http://glew.sourceforge.net/)
-#
-find_package(GLEW)
-if(NOT GLEW_FOUND)
-    message(ERROR "GLEW not found!")
-endif(NOT GLEW_FOUND)
-
-include_directories(${GLEW_INCLUDE_DIRS})
-
-
 ################################################################################
 #
 # build and link:
@@ -75,5 +64,4 @@ target_link_libraries( enjen
     ${CONAN_LIBS}
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARIES}
 )
