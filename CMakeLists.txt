@@ -8,6 +8,9 @@ include(${PROJECT_SOURCE_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin" )
+
+
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/ext/jsoncpp")
 
@@ -65,3 +68,7 @@ target_link_libraries( enjen
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
 )
+
+
+#install(DIRECTORY install_root/ DESTINATION "${PROJECT_SOURCE_DIR}/bin")
+file(COPY install_root/ DESTINATION "${PROJECT_SOURCE_DIR}/bin")

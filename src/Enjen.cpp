@@ -34,7 +34,7 @@ Enjen::~Enjen()
 bool Enjen::Startup()
 {
 	_cfg = std::make_unique<Cfg>();
-	if( ! _cfg->LoadFile("config.json") ) {
+	if( ! _cfg->LoadFile("cfg/config.json") ) {
 		std::cerr << "Enjen failed to load config file." << std::endl;
 		return false;
 	}
@@ -100,15 +100,29 @@ void Enjen::Run()
 		
 		_rt->Update();
 		if(_input->CheckButton(0, "BACK")) {
-			std::cout << "Enjen stopping - BACK key pressed." << std::endl;
+			std::cout << "Enjen stopping - BACK button pressed." << std::endl;
 			Stop();
 			break;
 		}
+		if(_input->CheckButton(0, "B1")) {
+			std::cout << "B1 button pressed." << std::endl;
+			_renderer->SetClearColour(0.0f, 0.0f, 0.0f);
+		}
+		if(_input->CheckButton(0, "B2")) {
+			std::cout << "B2 button pressed." << std::endl;
+			_renderer->SetClearColour(1.0f, 0.0f, 0.0f);
+		}
+		if(_input->CheckButton(0, "B3")) {
+			std::cout << "B3 button pressed." << std::endl;
+			_renderer->SetClearColour(0.0f, 1.0f, 0.0f);
+		}
+		if(_input->CheckButton(0, "B4")) {
+			std::cout << "B4 button pressed." << std::endl;
+			_renderer->SetClearColour(0.0f, 0.0f, 1.0f);
+		}
 
-//		if (_run_game) {
-//			_renderer->ClearFrame();
-//			_renderer->ShowFrame();
-//		}
+		_renderer->ClearFrame();
+		_renderer->ShowFrame();
 	}
 	
 	std::cout << "Enjen finished running." << std::endl;
