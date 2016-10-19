@@ -46,10 +46,11 @@ bool Enjen::Startup()
 	}
 	
 	_input = std::make_unique<Input>();
-	int controller_id = _input->AddController();
+	std::string controller_id = "P1";
+	_input->AddController( controller_id );
 	std::cout << "Enjen added input controller: " << controller_id << std::endl;
 	
-	Enjen::Set(this);
+	Enjen::SetInstance( this );
 
 	return true;
 }
@@ -58,6 +59,8 @@ bool Enjen::Startup()
 void Enjen::Shutdown()
 {
 	CloseWindow();
+	
+	_input = nullptr;
 	
 	if (_rt) {
 		_rt->Shutdown();
@@ -75,11 +78,35 @@ bool Enjen::CreateWindow()
 		return false;
 	}
 	
-	_renderer = _rt->CreateWindow("enjen - test");
+	std::string title = "enjen";
+	unsigned int width = 1280;
+	unsigned int height = 720;
+	bool border = true;
+	
+	auto cfg = _cfg->GetRoot();
+	if(cfg.isObject()) {
+		if(cfg.isMember("window") && cfg["window"].isObject()) {
+			if(cfg["window"].isMember("title") && cfg["window"]["title"].isString()) {
+				title = cfg["window"]["title"].asString();
+			}
+			if(cfg["window"].isMember("width") && cfg["window"]["width"].isUInt()) {
+				width = cfg["window"]["width"].asUInt();
+			}
+			if(cfg["window"].isMember("height") && cfg["window"]["height"].isUInt()) {
+				height = cfg["window"]["height"].asUInt();
+			}
+			if(cfg["window"].isMember("border") && cfg["window"]["border"].isBool()) {
+				border = cfg["window"]["border"].asBool();
+			}
+		}
+	}
+	
+	_renderer = _rt->CreateWindow(title, width, height, border);
 	if(! _renderer) {
 		std::cerr << "Enjen failed to create the window." << std::endl;
 		return false;
 	}
+	
 	return true;
 }
 
@@ -94,33 +121,61 @@ void Enjen::CloseWindow()
 
 
 void Enjen::Run()
-{	
+{
+	std::cout << "Enjen running..." << std::endl;
+	
 	_run_game = true;
 	while ( _run_game ) {
 		
+		//
+		// Update the state of the runtime:
+		//
+		
 		_rt->Update();
-		if(_input->CheckButton(0, "BACK")) {
+		
+		
+		//
+		// TEST - handle player input:
+		//
+		
+		if(_input->CheckButton("P1", "BACK")) {
 			std::cout << "Enjen stopping - BACK button pressed." << std::endl;
 			Stop();
 			break;
 		}
-		if(_input->CheckButton(0, "B1")) {
+		
+		if(_input->CheckButton("P1", "B1")) {
 			std::cout << "B1 button pressed." << std::endl;
 			_renderer->SetClearColour(0.0f, 0.0f, 0.0f);
 		}
-		if(_input->CheckButton(0, "B2")) {
+		if(_input->CheckButton("P1", "B2")) {
 			std::cout << "B2 button pressed." << std::endl;
 			_renderer->SetClearColour(1.0f, 0.0f, 0.0f);
 		}
-		if(_input->CheckButton(0, "B3")) {
+		if(_input->CheckButton("P1", "B3")) {
 			std::cout << "B3 button pressed." << std::endl;
 			_renderer->SetClearColour(0.0f, 1.0f, 0.0f);
 		}
-		if(_input->CheckButton(0, "B4")) {
+		if(_input->CheckButton("P1", "B4")) {
 			std::cout << "B4 button pressed." << std::endl;
 			_renderer->SetClearColour(0.0f, 0.0f, 1.0f);
 		}
+		
+		
+		//
+		// TEST - handle developer-mode input:
+		//
+		
+		if(_input->CheckButton("P1", "DEV1")) {
+			std::cout << "DEV1 button pressed." << std::endl;
+			_renderer->SetClearColour(1.0f, 1.0f, 1.0f);
+		}
 
+		
+		//
+		// Render the scene:
+		//
+		
 		_renderer->ClearFrame();
 		_renderer->ShowFrame();
 	}
@@ -135,13 +190,13 @@ void Enjen::Stop()
 }
 
 
-Enjen *Enjen::Get()
+Enjen *Enjen::GetInstance()
 {
 	return _enjen;
 }
 
 
-bool Enjen::Set( Enjen *instance )
+bool Enjen::SetInstance( Enjen *instance )
 {
 	// nullptr clears the current instance
 	if(instance == nullptr) {
@@ -172,18 +227,18 @@ void Enjen::Sleep( unsigned int milliseconds )
 }
 
 
-bool Enjen::CheckControllerButton( unsigned int controller_id, std::string button_name )
+bool Enjen::CheckControllerButton( std::string controller_id, std::string button_name )
 {
-	if(controller_id < _input->ControllerCount()) {
+	if(! _input->HasController(controller_id)) {
 		return false;
 	}
 	return _input->CheckButton(controller_id, button_name);
 }
 
 
-void Enjen::UpdateControllerButton( unsigned int controller_id, std::string button_name, bool pressed )
+void Enjen::UpdateControllerButton( std::string controller_id, std::string button_name, bool pressed )
 {
-	if(controller_id < _input->ControllerCount()) {
+	if(! _input->HasController(controller_id)) {
 		return;
 	}
 	_input->UpdateButton(controller_id, button_name, pressed);

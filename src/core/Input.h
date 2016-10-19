@@ -19,16 +19,16 @@ public:
 	Input();
 	~Input();
 	
-	int AddController();
-	int ControllerCount();
+	bool AddController( std::string controller_id );
+	bool HasController( std::string controller_id );
 	
-	bool CheckButton( unsigned int controller_id, std::string button_name );
-	void UpdateButton( unsigned int controller_id, std::string button_name, bool pressed );
+	bool CheckButton( std::string controller_id, std::string button_name );
+	void UpdateButton( std::string controller_id, std::string button_name, bool pressed );
 
 
 private:
 	
-	std::vector<std::unique_ptr<Controller>> _controllers;
+	std::map<std::string,std::unique_ptr<Controller>> _controllers;
 	
 	
 };

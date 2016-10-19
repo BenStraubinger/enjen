@@ -44,7 +44,7 @@ private:
 
 	glm::vec3 _clear_colour;
 
-	bool InitGraphics();
+	bool InitGraphics( bool vsync = true );
 
 };
 

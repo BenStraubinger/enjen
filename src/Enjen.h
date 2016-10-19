@@ -27,7 +27,7 @@ public:
 	Enjen();
 	~Enjen();
 	
-	static Enjen* Get();
+	static Enjen* GetInstance();
 
 	bool Startup();
 	void Shutdown();
@@ -41,15 +41,15 @@ public:
 	void Sleep(unsigned int milliseconds);
 	
 	
-	bool CheckControllerButton( unsigned int controller_id, std::string button_name );
-	void UpdateControllerButton( unsigned int controller_id, std::string button_name, bool pressed );
+	bool CheckControllerButton( std::string controller_id, std::string button_name );
+	void UpdateControllerButton( std::string controller_id, std::string button_name, bool pressed );
 
 
 private:
 	
 	// basic singleton
 	static Enjen* _enjen;
-	static bool Set(Enjen* instance);
+	static bool SetInstance( Enjen *instance );
 	
 	// game state
 	bool _run_game;

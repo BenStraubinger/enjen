@@ -23,7 +23,7 @@ Renderer::~Renderer()
 
 bool Renderer::CreateWindow(std::string title, unsigned int width, unsigned int height, bool border)
 {
-	Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+	Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
 	if (! border) {
 		sdl_flags |= SDL_WINDOW_BORDERLESS;
@@ -47,7 +47,7 @@ bool Renderer::CreateWindow(std::string title, unsigned int width, unsigned int 
 		return false;
 	}
 
-	if (!InitGraphics())
+	if (!InitGraphics( true ))
 	{
 		std::cerr << "Renderer failed to set up the window. " << std::endl;
 		return false;
@@ -121,7 +121,7 @@ void Renderer::LogGraphicsInfo()
 	std::cout << "SDL_GL_DEPTH_SIZE: " << value << std::endl;
 
 	value = SDL_GL_GetSwapInterval();
-	if(value) {
+	if(value == 1) {
 		std::cout << "VSync: yes" << std::endl;
 	} else {
 		std::cout << "VSync: no" << std::endl;
@@ -129,7 +129,7 @@ void Renderer::LogGraphicsInfo()
 }
 
 
-bool Renderer::InitGraphics()
+bool Renderer::InitGraphics( bool vsync )
 {
 	int failure = 0;
 	failure |= SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -140,8 +140,11 @@ bool Renderer::InitGraphics()
 	failure |= SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	failure |= SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	// enable VSync
-	failure |= SDL_GL_SetSwapInterval(1);
+	if(vsync) {
+		failure |= SDL_GL_SetSwapInterval(1);
+	} else {
+		failure |= SDL_GL_SetSwapInterval(0);
+	}
 
 	if(failure) {
 		std::cerr << "Renderer failed to set OpenGL attributes." << std::endl;

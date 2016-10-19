@@ -11,23 +11,30 @@ Input::~Input()
 }
 
 
-int Input::AddController()
+bool Input::AddController( std::string controller_id )
 {
-	_controllers.push_back(std::make_unique<Controller>());
-	return (int)_controllers.size() - 1;
+	// prevent duplicates
+	if(HasController(controller_id)) {
+		return false;
+	}
+	_controllers[controller_id] = std::make_unique<Controller>();
+	return true;
 }
 
 
-int Input::ControllerCount()
+bool Input::HasController( std::string controller_id )
 {
-	return (int)_controllers.size() - 1;
+	if(_controllers.count(controller_id) > 0) {
+		return true;
+	};
+	return false;
 }
 
 
-bool Input::CheckButton( unsigned int controller_id, std::string button_name )
+bool Input::CheckButton( std::string controller_id, std::string button_name )
 {
 	// ignore unknown controllers
-	if(controller_id > ControllerCount()) {
+	if(! HasController(controller_id)) {
 		return false;
 	}
 	
@@ -35,10 +42,10 @@ bool Input::CheckButton( unsigned int controller_id, std::string button_name )
 }
 
 
-void Input::UpdateButton( unsigned int controller_id, std::string button_name, bool pressed )
+void Input::UpdateButton( std::string controller_id, std::string button_name, bool pressed )
 {
 	// ignore unknown controllers
-	if(controller_id > ControllerCount()) {
+	if(! HasController(controller_id)) {
 		return;
 	}
 	
