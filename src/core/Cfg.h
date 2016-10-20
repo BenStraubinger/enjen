@@ -18,11 +18,9 @@ public:
 
 	Json::Value& GetRoot();
 
-
 private:
 
 	Json::Value _cfg;
-
 
 };
 

@@ -2,6 +2,12 @@
 SDL2/2.0.4@lasote/stable
 glm/0.9.7.6@dlarudgus20/stable
 glew/2.0.0@coding3d/stable
+Boost/1.60.0@lasote/stable
+
+[options]
+Boost:header_only=True
+Boost:shared=False
+Boost:python=False
 
 [generators]
 cmake

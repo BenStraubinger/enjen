@@ -4,6 +4,8 @@
 #include "Enjen.h"
 #include "core/Cfg.h"
 
+#include "graphics/ShaderProgram.h"
+
 
 #include <iostream>
 
@@ -126,6 +128,38 @@ void Renderer::LogGraphicsInfo()
 	} else {
 		std::cout << "VSync: no" << std::endl;
 	}
+}
+
+
+bool Renderer::LoadShader( std::string shader_id, std::string vert_shader_filename, std::string frag_shader_filename )
+{
+	if(_shaders.count(shader_id)) {
+		std::cerr << "Shader already loaded: " << shader_id << std::endl;
+		return false;
+	}
+	_shaders[shader_id] = std::make_unique<ShaderProgram>();
+	auto shader = _shaders[shader_id].get();
+	if( ! shader->Load(vert_shader_filename, frag_shader_filename) ) {
+		std::cerr << "Renderer failed to load shader: " << shader_id << std::endl;
+		_shaders.erase(shader_id);
+		return false;
+	}
+	std::cout << "Renderer loaded shader: " << shader_id << std::endl;
+	return true;
+}
+
+
+bool Renderer::UseShader( std::string shader_id )
+{
+	if(! _shaders.count(shader_id)) {
+		std::cerr << "Renderer missing shader: " << shader_id << std::endl;
+		return false;
+	}
+	
+	auto shader = _shaders[shader_id].get();
+	shader->Use();
+	
+	return true;
 }
 
 

@@ -39,16 +39,24 @@ bool Enjen::Startup()
 		return false;
 	}
 
+	
 	_rt = std::make_unique<Runtime>();
 	if(! _rt->Startup()) {
 		std::cerr << "Enjen failed to start the runtime." << std::endl;
 		return false;
 	}
 	
+	
 	_input = std::make_unique<Input>();
+	
 	std::string controller_id = "P1";
 	_input->AddController( controller_id );
 	std::cout << "Enjen added input controller: " << controller_id << std::endl;
+	
+	controller_id = "DEV";
+	_input->AddController( controller_id );
+	std::cout << "Enjen added input controller: " << controller_id << std::endl;
+	
 	
 	Enjen::SetInstance( this );
 
@@ -120,6 +128,77 @@ void Enjen::CloseWindow()
 }
 
 
+bool Enjen::LoadScene()
+{
+	std::cout << "Enjen setting up the scene..." << std::endl;
+	
+	
+	if(! _renderer->LoadShader("default", "shaders/vertex/default.glsl", "shaders/fragment/default.glsl")) {
+		std::cerr << "Enjen failed to load default shader." << std::endl;
+		return false;
+	}
+	std::cout << "Enjen loaded default shader." << std::endl;
+	
+	
+	// V1: position
+	_vertices[0] =  0.5f;
+	_vertices[1] = -0.5f;
+	_vertices[2] =  0.0f;
+	// V1: color
+	_vertices[3] = 1.0f;
+	_vertices[4] = 0.0f;
+	_vertices[5] = 0.0f;
+	
+	// V2: position
+	_vertices[6] = -0.5f;
+	_vertices[7] = -0.5f;
+	_vertices[8] =  0.0f;
+	// V2: color
+	_vertices[9]  = 0.0f;
+	_vertices[10] = 1.0f;
+	_vertices[11] = 0.0f;
+	
+	// V3: position
+	_vertices[12] = 0.0f;
+	_vertices[13] = 0.5f;
+	_vertices[14] = 0.0f;
+	// V3: color
+	_vertices[15] = 0.0f;
+	_vertices[16] = 0.0f;
+	_vertices[17] = 1.0f;
+	
+	
+	glGenVertexArrays(1, &_VAO);
+	glGenBuffers(1, &_VBO);
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	glBindVertexArray(_VAO);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices), _vertices, GL_STATIC_DRAW);
+	
+	// Position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	// Color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	
+	glBindVertexArray(0); // Unbind VAO
+	
+	
+	std::cout << "Enjen finished setting up the scene." << std::endl;
+	return true;
+}
+
+
+bool Enjen::UnloadScene()
+{
+	glDeleteVertexArrays(1, &_VAO);
+	glDeleteBuffers(1, &_VBO);
+	return true;
+}
+
+
 void Enjen::Run()
 {
 	std::cout << "Enjen running..." << std::endl;
@@ -161,13 +240,12 @@ void Enjen::Run()
 			_renderer->SetClearColour(0.0f, 0.0f, 1.0f);
 		}
 		
-		
 		//
 		// TEST - handle developer-mode input:
 		//
 		
-		if(_input->CheckButton("P1", "DEV1")) {
-			std::cout << "DEV1 button pressed." << std::endl;
+		if(_input->CheckButton("DEV", "1")) {
+			std::cout << "DEV: button 1 pressed." << std::endl;
 			_renderer->SetClearColour(1.0f, 1.0f, 1.0f);
 		}
 
@@ -177,6 +255,14 @@ void Enjen::Run()
 		//
 		
 		_renderer->ClearFrame();
+		
+		
+		_renderer->UseShader("default");
+		glBindVertexArray(_VAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
+		
+		
 		_renderer->ShowFrame();
 	}
 	

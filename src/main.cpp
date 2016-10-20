@@ -13,6 +13,10 @@ int main(int argc, char *argv[])
 		return 2;
 	}
 	
+	if (!game.LoadScene()) {
+		return 3;
+	}
+	
 	game.Run();
 
 	game.Shutdown();

@@ -12,10 +12,15 @@
 
 
 #include <string>
+#include <map>
+#include <memory>
 
 
 // forward declarations:
 class Enjen;
+class ShaderProgram;
+
+using ShaderMap = std::map<std::string,std::unique_ptr<ShaderProgram>>;
 
 
 class Renderer
@@ -35,6 +40,9 @@ public:
 	void ShowFrame();
 
 	void LogGraphicsInfo();
+	
+	bool LoadShader( std::string shader_id, std::string vert_shader_filename, std::string frag_shader_filename );
+	bool UseShader( std::string shader_id );
 
 
 private:
@@ -43,6 +51,9 @@ private:
 	SDL_GLContext _glContext;
 
 	glm::vec3 _clear_colour;
+	
+	ShaderMap _shaders;
+	
 
 	bool InitGraphics( bool vsync = true );
 

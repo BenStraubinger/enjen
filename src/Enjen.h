@@ -34,6 +34,9 @@ public:
 	
 	bool CreateWindow();
 	void CloseWindow();
+	
+	bool LoadScene();
+	bool UnloadScene();
 
 	void Run();
 	void Stop();
@@ -59,6 +62,12 @@ private:
 	std::unique_ptr<Runtime> _rt;
 	std::unique_ptr<Renderer> _renderer;
 	std::unique_ptr<Input> _input;
+	
+	
+	GLfloat _vertices[18];
+	GLuint _VBO;
+	GLuint _VAO;
+	
 	
 };
 

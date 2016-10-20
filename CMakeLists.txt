@@ -53,6 +53,8 @@ add_executable( enjen
         src/core/Input.cpp src/core/Input.h
         src/core/Controller.cpp src/core/Controller.h
 
+        src/graphics/ShaderProgram.cpp src/graphics/ShaderProgram.h
+
 
         #
         # external source libraries

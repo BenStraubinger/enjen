@@ -142,19 +142,19 @@ void Runtime::Update()
 
 			// dev-mode keys
 			case SDLK_1:
-				game->UpdateControllerButton("P1", "DEV1", key_pressed);
+				game->UpdateControllerButton("DEV", "1", key_pressed);
 				break;
 			case SDLK_2:
-				game->UpdateControllerButton("P1", "DEV2", key_pressed);
+				game->UpdateControllerButton("DEV", "2", key_pressed);
 				break;
 			case SDLK_3:
-				game->UpdateControllerButton("P1", "DEV3", key_pressed);
+				game->UpdateControllerButton("DEV", "3", key_pressed);
 				break;
 			case SDLK_4:
-				game->UpdateControllerButton("P1", "DEV4", key_pressed);
+				game->UpdateControllerButton("DEV", "4", key_pressed);
 				break;
 			case SDLK_5:
-				game->UpdateControllerButton("P1", "DEV5", key_pressed);
+				game->UpdateControllerButton("DEV", "5", key_pressed);
 				break;
 
 			// ignore unexpected keys
