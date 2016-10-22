@@ -20,10 +20,21 @@ Runtime::~Runtime()
 
 bool Runtime::Startup()
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK ) < 0)
 	{
 		std::cerr << "Runtime failed to initialize SDL2." << std::endl;
 		return false;
+	}
+
+	SDL_Joystick *ctrl;
+	for (int i = 0; i < SDL_NumJoysticks(); i++) {
+		ctrl = SDL_JoystickOpen(i);
+		if (ctrl) {
+			std::cout << "Runtime added joystick: " << SDL_JoystickNameForIndex(i) << std::endl <<
+				"    - " << (SDL_JoystickNumAxes(ctrl) / 2) << " sticks" << std::endl <<
+				"    - " << SDL_JoystickNumButtons(ctrl) << " buttons" << std::endl;
+			_active_joysticks.push_back(ctrl);
+		}
 	}
 
 	return true;
@@ -32,6 +43,13 @@ bool Runtime::Startup()
 
 void Runtime::Shutdown()
 {
+	for (std::vector<SDL_Joystick*>::iterator it = _active_joysticks.begin(); it != _active_joysticks.end(); it++) {
+		if (SDL_JoystickGetAttached(*it)) {
+			std::cout << "Runtime removed joystick: " << SDL_JoystickName(*it) << std::endl;
+			SDL_JoystickClose(*it);
+		}
+	}
+	_active_joysticks.clear();
 	SDL_Quit();
 }
 
@@ -60,12 +78,21 @@ void Runtime::Update()
 	
 	SDL_Event event;
 	bool key_pressed;
+	bool button_pressed;
 	while (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT) {
 			std::cout << "CloseWindow event - Last Window " << std::endl;
 			game->Stop();
 			return;
+		}
+
+
+		if ( event.type != SDL_WINDOWEVENT && 
+			event.type != SDL_KEYDOWN &&
+			event.type != SDL_KEYUP &&
+			event.type != SDL_MOUSEMOTION) {
+			std::cout << "SDL Event: " << event.type << std::endl;
 		}
 		
 		
@@ -83,19 +110,20 @@ void Runtime::Update()
 
 		if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
 		{
-			if(event.type == SDL_KEYDOWN) {
-				if(event.key.repeat != 0) {
+			if (event.type == SDL_KEYDOWN) {
+				if (event.key.repeat != 0) {
 					break;
 				}
 				key_pressed = true;
-			} else {
+			}
+			else {
 				key_pressed = false;
 			}
-			
+
 			switch (event.key.keysym.sym)
 			{
-			
-			// direction keys
+
+				// direction keys
 			case SDLK_UP:
 			case SDLK_w:
 				game->UpdateControllerButton("P1", "UP", key_pressed);
@@ -112,17 +140,17 @@ void Runtime::Update()
 			case SDLK_d:
 				game->UpdateControllerButton("P1", "RIGHT", key_pressed);
 				break;
-				
-			// start
+
+				// start
 			case SDLK_RETURN:
 				game->UpdateControllerButton("P1", "START", key_pressed);
 				break;
-			// back
+				// back
 			case SDLK_ESCAPE:
 				game->UpdateControllerButton("P1", "BACK", key_pressed);
 				break;
-				
-			// primary buttons
+
+				// primary buttons
 			case SDLK_SPACE:
 			case SDLK_SLASH:
 				game->UpdateControllerButton("P1", "B1", key_pressed);
@@ -140,7 +168,7 @@ void Runtime::Update()
 				game->UpdateControllerButton("P1", "B4", key_pressed);
 				break;
 
-			// dev-mode keys
+				// dev-mode keys
 			case SDLK_1:
 				game->UpdateControllerButton("DEV", "1", key_pressed);
 				break;
@@ -157,7 +185,91 @@ void Runtime::Update()
 				game->UpdateControllerButton("DEV", "5", key_pressed);
 				break;
 
+				// ignore unexpected keys
+			default:
+				break;
+			}
+		}
+
+
+		if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP )
+		{
+			if (event.type == SDL_JOYBUTTONDOWN) {
+				button_pressed = true;
+			}
+			else {
+				button_pressed = false;
+			}
+
+			switch (event.jbutton.button)
+			{
+			// primary buttons
+			case 0: // X
+				game->UpdateControllerButton("P1", "B3", button_pressed);
+				break;
+			case 1: // A
+				game->UpdateControllerButton("P1", "B1", button_pressed);
+				break;
+			case 2: // B
+				game->UpdateControllerButton("P1", "B2", button_pressed);
+				break;
+			case 3: // Y
+				game->UpdateControllerButton("P1", "B4", button_pressed);
+				break;
+
+			// start
+			case 9:
+				game->UpdateControllerButton("P1", "START", button_pressed);
+				break;
+			// back
+			case 8:
+				game->UpdateControllerButton("P1", "BACK", button_pressed);
+				break;
+
 			// ignore unexpected keys
+			default:
+				if (button_pressed) {
+					std::cout << "Joystick button pressed: " << std::to_string(event.jbutton.button) << std::endl;
+				}
+				else {
+					std::cout << "Joystick button released: " << std::to_string(event.jbutton.button) << std::endl;
+				}
+				
+				break;
+			}
+		}
+
+
+		if (event.type == SDL_JOYHATMOTION)
+		{
+			switch (event.jhat.value)
+			{
+
+				// dpad
+				case SDL_HAT_CENTERED: // middle
+					game->UpdateControllerButton("P1", "SDL_HAT_UP", false);
+					game->UpdateControllerButton("P1", "SDL_HAT_DOWN", false);
+					game->UpdateControllerButton("P1", "SDL_HAT_LEFT", false);
+					game->UpdateControllerButton("P1", "SDL_HAT_RIGHT", false);
+					break;
+				case SDL_HAT_UP:  // up
+					game->UpdateControllerButton("P1", "SDL_HAT_UP", true);
+					std::cout << "Joystick hat moved UP: " << std::to_string(event.jhat.value) << std::endl;
+					break;
+				case SDL_HAT_DOWN: // down
+					game->UpdateControllerButton("P1", "SDL_HAT_DOWN", true);
+					std::cout << "Joystick hat moved DOWN: " << std::to_string(event.jhat.value) << std::endl;
+					break;
+				case SDL_HAT_LEFT: // left
+					game->UpdateControllerButton("P1", "SDL_HAT_LEFT", true);
+					std::cout << "Joystick hat moved LEFT: " << std::to_string(event.jhat.value) << std::endl;
+					break;
+				case SDL_HAT_RIGHT: // right
+					game->UpdateControllerButton("P1", "SDL_HAT_RIGHT", true);
+					std::cout << "Joystick hat moved RIGHT: " << std::to_string(event.jhat.value) << std::endl;
+					break;
+
+				// ignore unexpected keys
 			default:
 				break;
 			}

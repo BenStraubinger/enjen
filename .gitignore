@@ -6,3 +6,13 @@ conanbuildinfo.*
 conaninfo.txt
 
 bin/
+*.vcxproj*
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+lib/
+x64/
+*.sln
+*.dir/
+VC.db
+*.VC.db

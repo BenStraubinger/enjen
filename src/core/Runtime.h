@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 
 // forward declarations:
@@ -33,6 +34,8 @@ public:
 
 
 private:
+
+	std::vector<SDL_Joystick*> _active_joysticks;
 
 };
 
