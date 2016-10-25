@@ -51,3 +51,25 @@ void Input::UpdateButton( std::string controller_id, std::string button_name, bo
 	
 	_controllers[controller_id].get()->UpdateButton(button_name, pressed);
 }
+
+
+DPadDirection Input::CheckDPad( std::string controller_id, std::string dpad_name )
+{
+	// ignore unknown controllers
+	if(! HasController(controller_id)) {
+		return DPadDirection::UNKNOWN;
+	}
+	
+	return _controllers[controller_id].get()->CheckDPad(dpad_name);
+}
+
+
+void Input::UpdateDPad( std::string controller_id, std::string dpad_name, DPadDirection direction )
+{
+	// ignore unknown controllers
+	if(! HasController(controller_id)) {
+		return;
+	}
+	
+	_controllers[controller_id].get()->UpdateDPad(dpad_name, direction);
+}

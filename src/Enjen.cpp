@@ -191,6 +191,21 @@ bool Enjen::LoadScene()
 }
 
 
+void Enjen::DrawScene()
+{
+	_renderer->ClearFrame();
+	
+	
+	_renderer->UseShader("default");
+	glBindVertexArray(_VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glBindVertexArray(0);
+	
+	
+	_renderer->ShowFrame();
+}
+
+
 bool Enjen::UnloadScene()
 {
 	glDeleteVertexArrays(1, &_VAO);
@@ -240,6 +255,11 @@ void Enjen::Run()
 			_renderer->SetClearColour(0.0f, 0.0f, 1.0f);
 		}
 		
+		if(_input->CheckDPad("P1", "DPAD") == DPadDirection::N) {
+			std::cout << "DPad UP pressed." << std::endl;
+			_renderer->SetClearColour(0.3f, 0.6f, 0.9f);
+		}
+		
 		//
 		// TEST - handle developer-mode input:
 		//
@@ -254,16 +274,7 @@ void Enjen::Run()
 		// Render the scene:
 		//
 		
-		_renderer->ClearFrame();
-		
-		
-		_renderer->UseShader("default");
-		glBindVertexArray(_VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
-		
-		
-		_renderer->ShowFrame();
+		DrawScene();
 	}
 	
 	std::cout << "Enjen finished running." << std::endl;
@@ -328,4 +339,22 @@ void Enjen::UpdateControllerButton( std::string controller_id, std::string butto
 		return;
 	}
 	_input->UpdateButton(controller_id, button_name, pressed);
+}
+
+
+DPadDirection Enjen::CheckControllerDPad( std::string controller_id, std::string dpad_name )
+{
+	if(! _input->HasController(controller_id)) {
+		return DPadDirection::UNKNOWN;
+	}
+	return _input->CheckDPad(controller_id, dpad_name);
+}
+
+
+void Enjen::UpdateControllerDPad( std::string controller_id, std::string dpad_name, DPadDirection direction )
+{
+	if(! _input->HasController(controller_id)) {
+		return;
+	}
+	_input->UpdateDPad(controller_id, dpad_name, direction);
 }

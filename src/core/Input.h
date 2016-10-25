@@ -24,6 +24,8 @@ public:
 	
 	bool CheckButton( std::string controller_id, std::string button_name );
 	void UpdateButton( std::string controller_id, std::string button_name, bool pressed );
+	DPadDirection CheckDPad( std::string controller_id, std::string dpad_name );
+	void UpdateDPad( std::string controller_id, std::string dpad_name, DPadDirection direction);
 
 
 private:

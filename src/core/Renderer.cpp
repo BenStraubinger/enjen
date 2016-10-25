@@ -73,7 +73,7 @@ void Renderer::CloseWindow()
 void Renderer::ClearFrame()
 {
 	glClearColor(_clear_colour.r, _clear_colour.g, _clear_colour.b, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 
@@ -192,6 +192,8 @@ bool Renderer::InitGraphics( bool vsync )
 		std::cerr << "Renderer failed to initialize GLEW." << std::endl;
 		return false;
 	}
+	
+	glEnable(GL_DEPTH_TEST);
 
 	return true;
 }

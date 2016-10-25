@@ -26,5 +26,20 @@ void Controller::UpdateButton( std::string button_name, bool pressed )
 }
 
 
+DPadDirection Controller::CheckDPad( std::string dpad_name )
+{
+	if(_dpads.count(dpad_name) > 0) {
+		return _dpads[dpad_name];
+	}
+	return DPadDirection::UNKNOWN;
+}
+
+
+void Controller::UpdateDPad( std::string dpad_name, DPadDirection direction )
+{
+	_dpads[dpad_name] = direction;
+}
+
+
 
 

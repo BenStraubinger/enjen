@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <core/Controller.h>
 
 
 // forward declarations:
@@ -36,6 +37,7 @@ public:
 	void CloseWindow();
 	
 	bool LoadScene();
+	void DrawScene();
 	bool UnloadScene();
 
 	void Run();
@@ -46,6 +48,8 @@ public:
 	
 	bool CheckControllerButton( std::string controller_id, std::string button_name );
 	void UpdateControllerButton( std::string controller_id, std::string button_name, bool pressed );
+	DPadDirection CheckControllerDPad( std::string controller_id, std::string dpad_name );
+	void UpdateControllerDPad( std::string controller_id, std::string dpad_name, DPadDirection direction);
 
 
 private:

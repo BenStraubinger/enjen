@@ -126,19 +126,35 @@ void Runtime::Update()
 				// direction keys
 			case SDLK_UP:
 			case SDLK_w:
-				game->UpdateControllerButton("P1", "UP", key_pressed);
+				if(key_pressed) {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::N);
+				} else {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::CENTER);
+				}
 				break;
 			case SDLK_DOWN:
 			case SDLK_s:
-				game->UpdateControllerButton("P1", "DOWN", key_pressed);
+				if(key_pressed) {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::S);
+				} else {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::CENTER);
+				}
 				break;
 			case SDLK_LEFT:
 			case SDLK_a:
-				game->UpdateControllerButton("P1", "LEFT", key_pressed);
+				if(key_pressed) {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::W);
+				} else {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::CENTER);
+				}
 				break;
 			case SDLK_RIGHT:
 			case SDLK_d:
-				game->UpdateControllerButton("P1", "RIGHT", key_pressed);
+				if(key_pressed) {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::E);
+				} else {
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::CENTER);
+				}
 				break;
 
 				// start
@@ -246,32 +262,38 @@ void Runtime::Update()
 			{
 
 				// dpad
-				case SDL_HAT_CENTERED: // middle
-					game->UpdateControllerButton("P1", "SDL_HAT_UP", false);
-					game->UpdateControllerButton("P1", "SDL_HAT_DOWN", false);
-					game->UpdateControllerButton("P1", "SDL_HAT_LEFT", false);
-					game->UpdateControllerButton("P1", "SDL_HAT_RIGHT", false);
+				case SDL_HAT_CENTERED:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::CENTER);
 					break;
-				case SDL_HAT_UP:  // up
-					game->UpdateControllerButton("P1", "SDL_HAT_UP", true);
-					std::cout << "Joystick hat moved UP: " << std::to_string(event.jhat.value) << std::endl;
+				case SDL_HAT_UP:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::N);
 					break;
-				case SDL_HAT_DOWN: // down
-					game->UpdateControllerButton("P1", "SDL_HAT_DOWN", true);
-					std::cout << "Joystick hat moved DOWN: " << std::to_string(event.jhat.value) << std::endl;
+				case SDL_HAT_RIGHTUP:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::NE);
 					break;
-				case SDL_HAT_LEFT: // left
-					game->UpdateControllerButton("P1", "SDL_HAT_LEFT", true);
-					std::cout << "Joystick hat moved LEFT: " << std::to_string(event.jhat.value) << std::endl;
+				case SDL_HAT_RIGHT:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::E);
 					break;
-				case SDL_HAT_RIGHT: // right
-					game->UpdateControllerButton("P1", "SDL_HAT_RIGHT", true);
-					std::cout << "Joystick hat moved RIGHT: " << std::to_string(event.jhat.value) << std::endl;
+				case SDL_HAT_RIGHTDOWN:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::SE);
+					break;
+				case SDL_HAT_DOWN:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::S);
+					break;
+				case SDL_HAT_LEFTDOWN:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::SW);
+					break;
+				case SDL_HAT_LEFT:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::W);
+					break;
+				case SDL_HAT_LEFTUP:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::NW);
 					break;
 
 				// ignore unexpected keys
-			default:
-				break;
+				default:
+					game->UpdateControllerDPad("P1", "DPAD", DPadDirection::UNKNOWN);
+					break;
 			}
 		}
 	}
