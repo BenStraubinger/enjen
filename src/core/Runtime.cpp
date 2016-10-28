@@ -296,6 +296,37 @@ void Runtime::Update()
 					break;
 			}
 		}
+
+
+		if (event.type == SDL_JOYAXISMOTION)
+		{
+			std::string joystick_name = "";
+			switch (event.jaxis.axis)
+			{
+				case 0:
+					joystick_name = "JOY0-X";
+					break;
+
+				case 1:
+					joystick_name = "JOY0-Y";
+					break;
+
+				case 2:
+					joystick_name = "JOY1-X";
+					break;
+
+				case 3:
+					joystick_name = "JOY1-Y";
+					break;
+
+				default:
+					break;
+			}
+			if (joystick_name != "") {
+				game->UpdateControllerJoystick("P1", joystick_name, event.jaxis.value);
+				std::cout << "Joystick Move Event - " << joystick_name << ": " << game->CheckControllerJoystick("P1", joystick_name) << std::endl;
+			}
+		}
 	}
 }
 

@@ -358,3 +358,21 @@ void Enjen::UpdateControllerDPad( std::string controller_id, std::string dpad_na
 	}
 	_input->UpdateDPad(controller_id, dpad_name, direction);
 }
+
+
+int Enjen::CheckControllerJoystick(std::string controller_id, std::string joystick_name)
+{
+	if (!_input->HasController(controller_id)) {
+		return 0;
+	}
+	return _input->CheckJoystick(controller_id, joystick_name);
+}
+
+
+void Enjen::UpdateControllerJoystick(std::string controller_id, std::string joystick_name, int value)
+{
+	if (!_input->HasController(controller_id)) {
+		return;
+	}
+	return _input->UpdateJoystick(controller_id, joystick_name, value);
+}
