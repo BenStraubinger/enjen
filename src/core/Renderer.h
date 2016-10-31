@@ -54,8 +54,9 @@ private:
 	
 	ShaderMap _shaders;
 	
-
-	bool InitGraphics( bool vsync = true );
+	
+	bool InitGraphics();
+	bool InitWindow(bool vsync = true);
 
 };
 

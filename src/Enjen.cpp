@@ -170,6 +170,7 @@ bool Enjen::LoadScene()
 	
 	glGenVertexArrays(1, &_VAO);
 	glGenBuffers(1, &_VBO);
+	
 	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
 	glBindVertexArray(_VAO);
 	

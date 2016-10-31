@@ -25,6 +25,12 @@ Renderer::~Renderer()
 
 bool Renderer::CreateWindow(std::string title, unsigned int width, unsigned int height, bool border)
 {
+	if (!InitGraphics())
+	{
+		std::cerr << "Renderer failed to set graphics properties for the window. " << std::endl;
+		return false;
+	}
+
 	Uint32 sdl_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
 
 	if (! border) {
@@ -48,10 +54,10 @@ bool Renderer::CreateWindow(std::string title, unsigned int width, unsigned int 
 		std::cerr << "Renderer failed to create OpenGL context: " << SDL_GetError() << std::endl;
 		return false;
 	}
-
-	if (!InitGraphics( true ))
+	
+	if (!InitWindow(true))
 	{
-		std::cerr << "Renderer failed to set up the window. " << std::endl;
+		std::cerr << "Renderer failed to set set up the window. " << std::endl;
 		return false;
 	}
 
@@ -104,7 +110,7 @@ void Renderer::LogGraphicsInfo()
 {
 	int value = 0;
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &value);
-	std::cout << "SDL_GL_CONTEXT_MAJOR_VERSION : " << value << std::endl;
+	std::cout << "SDL_GL_CONTEXT_MAJOR_VERSION: " << value << std::endl;
 
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &value);
 	std::cout << "SDL_GL_CONTEXT_MINOR_VERSION: " << value << std::endl;
@@ -116,18 +122,20 @@ void Renderer::LogGraphicsInfo()
 		std::cout << "SDL_GL_CONTEXT_PROFILE_CORE: no" << std::endl;
 	}
 
+	SDL_GL_GetAttribute(SDL_GL_ACCELERATED_VISUAL, &value);
+	std::cout << "SDL_GL_ACCELERATED_VISUAL: " << value << std::endl;
+
 	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
 	std::cout << "SDL_GL_DOUBLEBUFFER: " << value << std::endl;
 
 	SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
 	std::cout << "SDL_GL_DEPTH_SIZE: " << value << std::endl;
 
+	SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+	std::cout << "SDL_GL_STENCIL_SIZE: " << value << std::endl;
+
 	value = SDL_GL_GetSwapInterval();
-	if(value == 1) {
-		std::cout << "VSync: yes" << std::endl;
-	} else {
-		std::cout << "VSync: no" << std::endl;
-	}
+	std::cout << "VSync: " << value << std::endl;
 }
 
 
@@ -163,37 +171,46 @@ bool Renderer::UseShader( std::string shader_id )
 }
 
 
-bool Renderer::InitGraphics( bool vsync )
+bool Renderer::InitGraphics()
 {
 	int failure = 0;
 	failure |= SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	//failure |= SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 	failure |= SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	failure |= SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	failure |= SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	failure |= SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	failure |= SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
+	return true;
+}
+
+
+bool Renderer::InitWindow(bool vsync)
+{
+	int failure = 0;
+	
 	if(vsync) {
 		failure |= SDL_GL_SetSwapInterval(1);
 	} else {
 		failure |= SDL_GL_SetSwapInterval(0);
 	}
-
 	if(failure) {
-		std::cerr << "Renderer failed to set OpenGL attributes." << std::endl;
+		std::cerr << "Renderer failed to set VSync." << std::endl;
 		return false;
 	}
-
+	
 	glewExperimental = GL_TRUE;
 	failure |= glewInit();
-
+	
 	if(failure) {
 		std::cerr << "Renderer failed to initialize GLEW." << std::endl;
 		return false;
 	}
 	
 	glEnable(GL_DEPTH_TEST);
-
+	
 	return true;
 }
