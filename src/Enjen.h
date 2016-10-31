@@ -49,7 +49,9 @@ public:
 	bool CheckControllerButton( std::string controller_id, std::string button_name );
 	void UpdateControllerButton( std::string controller_id, std::string button_name, bool pressed );
 	DPadDirection CheckControllerDPad( std::string controller_id, std::string dpad_name );
-	void UpdateControllerDPad( std::string controller_id, std::string dpad_name, DPadDirection direction);
+	void UpdateControllerDPad( std::string controller_id, std::string dpad_name, DPadDirection direction );
+	int CheckControllerJoystick( std::string controller_id, std::string joystick_name );
+	void UpdateControllerJoystick( std::string controller_id, std::string joystick_name, int value );
 
 
 private:

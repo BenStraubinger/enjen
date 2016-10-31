@@ -26,6 +26,8 @@ public:
 	void UpdateButton( std::string controller_id, std::string button_name, bool pressed );
 	DPadDirection CheckDPad( std::string controller_id, std::string dpad_name );
 	void UpdateDPad( std::string controller_id, std::string dpad_name, DPadDirection direction);
+	int CheckJoystick(std::string controller_id, std::string joystick_name);
+	void UpdateJoystick(std::string controller_id, std::string joystick_name, int value);
 
 
 private:

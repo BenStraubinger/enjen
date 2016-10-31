@@ -73,3 +73,25 @@ void Input::UpdateDPad( std::string controller_id, std::string dpad_name, DPadDi
 	
 	_controllers[controller_id].get()->UpdateDPad(dpad_name, direction);
 }
+
+
+int Input::CheckJoystick(std::string controller_id, std::string joystick_name)
+{
+	// ignore unknown controllers
+	if (!HasController(controller_id)) {
+		return 0;
+	}
+
+	return _controllers[controller_id].get()->CheckJoystick(joystick_name);
+}
+
+
+void Input::UpdateJoystick(std::string controller_id, std::string joystick_name, int value)
+{
+	// ignore unknown controllers
+	if (!HasController(controller_id)) {
+		return;
+	}
+
+	return _controllers[controller_id].get()->UpdateJoystick(joystick_name, value);
+}

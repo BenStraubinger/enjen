@@ -41,5 +41,33 @@ void Controller::UpdateDPad( std::string dpad_name, DPadDirection direction )
 }
 
 
+int Controller::CheckJoystick(std::string joystick_name)
+{
+	if (_joysticks.count(joystick_name) > 0) {
+		return _joysticks[joystick_name];
+	}
+	return 0;
+}
 
+
+void Controller::UpdateJoystick(std::string joystick_name, int value)
+{
+	// normalize joystick value
+	if (value >= 0) {
+		if (value < _joystick_deadzone) {
+			value = 0;
+		} else if (value > _joystick_max_value) {
+			value = _joystick_max_value;
+		}
+	} else {
+		if (value > (0 - _joystick_deadzone)) {
+			value = 0;
+		}
+		else if (value < (0 - _joystick_max_value)) {
+			value = 0 - _joystick_max_value;
+		}
+	}
+
+	_joysticks[joystick_name] = value;
+}
 
